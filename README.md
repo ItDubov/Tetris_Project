@@ -1,3 +1,3 @@
 # Tetris_Project
-Добавить библиотеку pygame
+Add Library pygame
 pip install pygame
