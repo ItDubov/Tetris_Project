@@ -2,10 +2,10 @@ import openai
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
-
-token = #Токен телграм канала
-
-openai.api_key = #Токен OpenAI
+#Токен телграм канала
+token = ''
+#Токен OpenAI
+openai.api_key =''
 
 bot = Bot(token)
 dp = Dispatcher(bot)
