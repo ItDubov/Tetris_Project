@@ -1,10 +1,11 @@
+#Loading the pygame library
 import pygame
 from copy import deepcopy
 from random import choice, randrange
-
-W, H = 10, 20
-TILE = 35
-GAME_RES = W * TILE, H * TILE
+#Create an empty black window
+W, H = 10, 20 #playing field
+TILE = 35 #Tile size
+GAME_RES = W * TILE, H * TILE #Screen resolution
 RES = 680, 750
 FPS = 60
 
@@ -12,8 +13,8 @@ pygame.init()
 sc = pygame.display.set_mode(RES)
 game_sc = pygame.Surface(GAME_RES)
 clock = pygame.time.Clock()
-grid = [pygame.Rect(x * TILE, y * TILE, TILE, TILE) for x in range(W) for y in range(H)]
-figures_pos = [[(-1, 0), (-2, 0), (0, 0), (1, 0)],
+grid = [pygame.Rect(x * TILE, y * TILE, TILE, TILE) for x in range(W) for y in range(H)] #Two-dimensional array
+figures_pos = [[(-1, 0), (-2, 0), (0, 0), (1, 0)],#figure drawing
                [(0, -1), (-1, -1), (-1, 0), (0, 0)],
                [(-1, 0), (-1, 1), (0, 0), (0, -1)],
                [(0, 0), (-1, 0), (0, 1), (-1, -1)],
@@ -27,13 +28,13 @@ figure_rect = pygame.Rect(0, 0, TILE - 2, TILE - 2)
 field = [[0 for i in range(W)] for j in range(H)]
 
 anim_count, anim_speed, anim_limit = 0, 60, 2000
-
+#Images
 bg = pygame.image.load('img/Обложка.jpg').convert()
 game_bg = pygame.image.load('img/bg.jpg').convert()
-
+#Font
 main_font = pygame.font.Font('font/beer-money12.ttf', 85)
 font = pygame.font.Font('font/beer-money12.ttf', 45)
-
+#font color
 title_tetris = main_font.render('TETRIS', True, pygame.Color('darkorange'))
 title_score = font.render('score:', True, pygame.Color('green'))
 title_record = font.render('record:', True, pygame.Color('purple'))
@@ -42,12 +43,14 @@ figure, next_figure = deepcopy(choice(figures)), deepcopy(choice(figures))
 color, next_color = get_color(), get_color()
 score, lines = 0, 0
 scores = {0: 0, 1: 100, 2: 300, 3: 700, 4: 1500}
+#Adding Borders
 def check_borders():
     if figure[i].x < 0 or figure[i].x > W - 1:
         return False
     elif figure[i].y > H - 1 or field[figure[i].y][figure[i].x]:
         return False
     return True
+#
 def get_record():
     try:
         with open('record') as f:
@@ -55,20 +58,22 @@ def get_record():
     except FileNotFoundError:
         with open('record', 'w') as f:
             f.write('0')
+#Record display
 def set_record(record, score):
     rec = max(int(record), score)
     with open('record', 'w') as f:
         f.write(str(rec))
+#record record
 while True:
     record = get_record()
     dx, rotate = 0, False
     sc.blit(bg, (0, 0))
     sc.blit(game_sc, (20, 20))
     game_sc.blit(game_bg, (0, 0))
-    # delay for full lines
+
     for i in range(lines):
         pygame.time.wait(200)
-
+    # Movement of figures
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
@@ -88,7 +93,7 @@ while True:
         if not check_borders():
             figure = deepcopy(figure_old)
             break
-
+# move y
     anim_count += anim_speed
     if anim_count > anim_limit:
         anim_count = 0
@@ -102,7 +107,7 @@ while True:
                 next_figure, next_color = deepcopy(choice(figures)), get_color()
                 anim_limit = 2000
                 break
-
+#Rotation of figures
     center = figure[0]
     figure_old = deepcopy(figure)
     if rotate:
@@ -114,7 +119,7 @@ while True:
             if not check_borders():
                 figure = deepcopy(figure_old)
                 break
-
+#Removing filled lines
     line, lines = H - 1, 0
     for row in range(H - 1, -1, -1):
         count = 0
@@ -142,18 +147,18 @@ while True:
             if col:
                 figure_rect.x, figure_rect.y = x * TILE, y * TILE
                 pygame.draw.rect(game_sc, col, figure_rect)
-
+#Displaying the next shape
     for i in range(4):
         figure_rect.x = next_figure[i].x * TILE + 380
         figure_rect.y = next_figure[i].y * TILE + 185
         pygame.draw.rect(sc, next_color, figure_rect)
-
+#Text placement
     sc.blit(title_tetris, (450, 20))
     sc.blit(title_score, (535, 600))
     sc.blit(font.render(str(score), True, pygame.Color('white')), (570, 650))
     sc.blit(title_record, (525, 500))
     sc.blit(font.render(record, True, pygame.Color('gold')), (550, 550))
-
+#End of the game
     for i in range(W):
         if field[0][i]:
             set_record(record, score)
